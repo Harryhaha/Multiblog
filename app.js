@@ -14,6 +14,7 @@ var MongoStore = require('connect-mongo')(session);
 var settings = require('./settings');
 
 var flash = require('connect-flash');
+var multer  = require('multer');
 
 var app = express();
 
@@ -36,14 +37,14 @@ app.use(session({
     saveUninitialized: true,
     resave: true,
     secret: settings.cookieSecret,
-    //key: settings.db,//cookie name
-    //cookie: {maxAge: 1000 * 60 * 60 * 24 * 30},//30 days
+    key: settings.db,//cookie name
+    cookie: {maxAge: 1000 * 60 * 60 * 24 * 30},//30 days
     store: new MongoStore({
         db: settings.db,
-        //host: settings.host,
-        //port: settings.port
+        host: settings.host,
+        port: settings.port
     })
-}))
+}));
 
 app.use(express.static(path.join(__dirname, 'public')));
 
@@ -92,6 +93,13 @@ app.use(function (err, req, res, next) {
         error: {}
     });
 });
+
+app.use(multer({
+    dest: './public/images',
+    rename: function (fieldname, filename) {
+        return filename;
+    }
+}));
 
 
 module.exports = app;
