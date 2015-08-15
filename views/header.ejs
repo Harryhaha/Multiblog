@@ -4,6 +4,7 @@
     <meta charset="UTF-8" />
     <title>Blog</title>
     <link rel="stylesheet" href="/stylesheets/style.css">
+    <link rel="stylesheet" href="/stylesheets/entry.css">
 </head>
 <body>
 
@@ -14,6 +15,7 @@
 <nav>
     <span><a title="主页" href="/">home</a></span>
     <% if (locals.user) { %>
+    <span><a title="上传" href="/upload">upload</a></span>
     <span><a title="发表" href="/post">post</a></span>
     <span><a title="登出" href="/logout">logout</a></span>
     <% } else { %>
