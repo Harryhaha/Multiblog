@@ -91,9 +91,11 @@ Post.getTen = function(name, page, callback) {
                         return callback(err);
                     }
                     //解析 markdown 为 html
-                    docs.forEach(function (doc) {
+                    /*
+                    docs.forEach(function (doc) {  
                         doc.post = markdown.toHTML(doc.post);
                     });
+                    */
                     callback(null, docs, total);
                 });
             });
@@ -139,7 +141,9 @@ Post.getOne = function(name, day, title, callback) {
                         }
                     });
                     //解析 markdown 为 html
+                    /*
                     doc.post = markdown.toHTML(doc.post);
+                    */
                     doc.comments.forEach(function (comment) {
                         comment.content = markdown.toHTML(comment.content);
                     });
@@ -179,7 +183,6 @@ Post.edit = function(name, day, title, callback) {
         });
     });
 };
-
 
 //更新一篇文章及其相关信息
 Post.update = function(name, day, title, post, callback) {
