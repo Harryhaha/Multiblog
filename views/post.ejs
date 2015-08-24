@@ -1,5 +1,5 @@
 <%- include header %>
-
+<script src="ckeditor/ckeditor.js"></script>
 <div class="entry">
     <form method="post">
         标题：<br />
@@ -10,10 +10,9 @@
         <textarea name="post" rows="20" cols="100"></textarea><br />
         <input type="submit" value="发表" />
     </form>
-   
-    <script>
-		CKEDITOR.replace( 'post' );
-	</script>  
-
 </div>
+<script>
+    CKEDITOR.replace('post');
+</script>
+
 <%- include footer %>

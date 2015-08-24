@@ -1,22 +1,44 @@
-<br />
-<% post.comments.forEach(function (comment, index) { %>
-<div style="padding-left:4em">
-    <p><img src="<%= comment.head %>" class="l_head" /><a href="<%= comment.website %>"><%= comment.name %></a>
-        <span class="info"> 回复于 <%= comment.time %></span></p>
-    <p><%- comment.content %></p>
-</div>
-<% }) %>
+<!-- Disqus comment plugin source code, which display the interface and count the comment. Harry 2015/08/21
 
-<form method="post">
-    <% if (user) { %>
-    姓名：<input type="text" name="name" value="<%= user.name %>" /><br />
-    邮箱：<input type="text" name="email" value="<%= user.email %>" /><br />
-    网址：<input type="text" name="website" value="/u/<%= user.name %>" /><br />
-    <% } else { %>
-    姓名：<input type="text" name="name" /><br />
-    邮箱：<input type="text" name="email" /><br />
-    网址：<input type="text" name="website" value="http://" /><br />
-    <% } %>
-    <textarea name="content" rows="5" cols="80"></textarea><br />
-    <input type="submit" value="留言" />
-</form>
+<div id="disqus_thread"></div>
+<script type="text/javascript">
+    /* * * CONFIGURATION VARIABLES * * */
+    var disqus_shortname = 'multiblogharry';
+
+    /* * * DON'T EDIT BELOW THIS LINE * * */
+    (function() {
+        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript" rel="nofollow">comments powered by Disqus.</a></noscript>
+
+
+<script type="text/javascript">
+    /* * * CONFIGURATION VARIABLES * * */
+    var disqus_shortname = 'multiblogharry';
+
+    /* * * DON'T EDIT BELOW THIS LINE * * */
+    (function () {
+        var s = document.createElement('script'); s.async = true;
+        s.type = 'text/javascript';
+        s.src = '//' + disqus_shortname + '.disqus.com/count.js';
+        (document.getElementsByTagName('HEAD')[0] || document.getElementsByTagName('BODY')[0]).appendChild(s);
+    }());
+</script>
+-->
+<br/>
+<hr/>
+<div class="fb-comments" data-href="http://localhost:3000/p/<%= page_id %>" data-width="600" data-numposts="10"></div>
+
+<div id="fb-root"></div>
+<script>
+    (function(d, s, id) {
+        var js, fjs = d.getElementsByTagName(s)[0];
+        if (d.getElementById(id)) return;
+        js = d.createElement(s); js.id = id;
+        js.src = "//connect.facebook.net/zh_CN/sdk.js#xfbml=1&version=v2.4";
+        fjs.parentNode.insertBefore(js, fjs);
+    }(document, 'script', 'facebook-jssdk'));
+</script>

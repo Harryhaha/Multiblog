@@ -266,14 +266,15 @@ module.exports = function (app) {
         });
     });
 
-    app.get('/u/:name/:day/:title', function (req, res) {
-        Post.getOne(req.params.name, req.params.day, req.params.title, function (err, post) {
+    app.get('/p/:_id', function (req, res) {
+        Post.getOne(req.params._id, function (err, post) {
             if (err) {
                 req.flash('error', err);
                 return res.redirect('/');
             }
             res.render('article', {
-                title: req.params.title,
+                page_id: req.params._id,
+                title: post.title,
                 post: post,
                 user: req.session.user,
                 success: req.flash('success').toString(),
@@ -282,10 +283,10 @@ module.exports = function (app) {
         });
     });
 
-    app.get('/edit/:name/:day/:title', checkLogin);
-    app.get('/edit/:name/:day/:title', function (req, res) {
-        var currentUser = req.session.user;
-        Post.edit(currentUser.name, req.params.day, req.params.title, function (err, post) {
+    app.get('/edit/:_id', checkLogin);
+    app.get('/edit/:_id', function (req, res) {
+        //var currentUser = req.session.user;
+        Post.edit(req.params._id, function (err, post) {
             if (err) {
                 req.flash('error', err);
                 return res.redirect('back');
@@ -300,11 +301,11 @@ module.exports = function (app) {
         });
     });
 
-    app.post('/edit/:name/:day/:title', checkLogin);
-    app.post('/edit/:name/:day/:title', function (req, res) {
-        var currentUser = req.session.user;
-        Post.update(currentUser.name, req.params.day, req.params.title, req.body.post, function (err) {
-            var url = encodeURI('/u/' + req.params.name + '/' + req.params.day + '/' + req.params.title);
+    app.post('/edit/:_id', checkLogin);
+    app.post('/edit/:_id', function (req, res) {
+        //var currentUser = req.session.user;
+        Post.update(req.params._id, req.body.post, function (err) {
+            var url = encodeURI('/p/' + req.params._id);
             if (err) {
                 req.flash('error', err);
                 return res.redirect(url);//出错！返回文章页
@@ -315,10 +316,10 @@ module.exports = function (app) {
     });
 
 
-    app.get('/remove/:name/:day/:title', checkLogin);
-    app.get('/remove/:name/:day/:title', function (req, res) {
-        var currentUser = req.session.user;
-        Post.remove(currentUser.name, req.params.day, req.params.title, function (err) {
+    app.get('/remove/:_id', checkLogin);
+    app.get('/remove/:_id', function (req, res) {
+        //var currentUser = req.session.user;
+        Post.remove(req.params._id, function (err) {
             if (err) {
                 req.flash('error', err);
                 return res.redirect('back');
@@ -328,33 +329,33 @@ module.exports = function (app) {
         });
     });
 
-    app.get('/reprint/:name/:day/:title', checkLogin);
-    app.get('/reprint/:name/:day/:title', function (req, res) {
-        Post.edit(req.params.name, req.params.day, req.params.title, function (err, post) {
+    app.get('/reprint/:_id', checkLogin);
+    app.get('/reprint/:_id', function (req, res) {
+        Post.edit(req.params._id, function (err, post) {
             if (err) {
                 req.flash('error', err);
                 return res.redirect(back);
             }
             var currentUser = req.session.user,
-                reprint_from = {name: post.name, day: post.time.day, title: post.title},
+                reprint_from = {_id: post._id, name: post.name, day: post.time.day, title: post.title},
                 reprint_to = {name: currentUser.name, head: currentUser.head};
             Post.reprint(reprint_from, reprint_to, function (err, post) {
 
-                var test_post = post;
+                //var test_post = post;
 
                 if (err) {
                     req.flash('error', err);
                     return res.redirect('back');
                 }
                 req.flash('success', '转载成功!');
-                var url = encodeURI('/u/' + post.name + '/' + post.time.day + '/' + post.title);
+                var url = encodeURI('/p/' + post._id);
                 //跳转到转载后的文章页面
                 res.redirect(url);
             });
         });
     });
 
-    app.post('/u/:name/:day/:title', function (req, res) {
+    app.post('/p/:_id', function (req, res) {
         var date = new Date(),
             time = date.getFullYear() + "-" + (date.getMonth() + 1) + "-" + date.getDate() + " " +
                 date.getHours() + ":" + (date.getMinutes() < 10 ? '0' + date.getMinutes() : date.getMinutes());
@@ -362,6 +363,7 @@ module.exports = function (app) {
             email_MD5 = md5.update(req.body.email.toLowerCase()).digest('hex'),
             head = "http://www.gravatar.com/avatar/" + email_MD5 + "?s=48";
         var comment = {
+            //page_id: req.params._id,
             name: req.body.name,
             head: head,
             email: req.body.email,
@@ -369,7 +371,7 @@ module.exports = function (app) {
             time: time,
             content: req.body.content
         };
-        var newComment = new Comment(req.params.name, req.params.day, req.params.title, comment);
+        var newComment = new Comment(req.params._id, comment);
         newComment.save(function (err) {
             if (err) {
                 req.flash('error', err);

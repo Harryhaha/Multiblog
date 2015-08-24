@@ -2,7 +2,7 @@
 <div class="entry">
     <% posts.forEach(function (post, index) { %>
     <p>
-        <h2><a href="/u/<%= post.name %>/<%= post.time.day %>/<%= post.title %>"><%= post.title %></a></h2>
+        <h2><a href="/p/<%= post._id %>"><%= post.title %></a></h2>
         <a href="/u/<%= post.name %>"><img src="<%= post.head %>" class="r_head" /></a>
     </p>
         <p class="info">
@@ -16,10 +16,10 @@
             <% }) %>
 
             <% if (post.reprint_info.reprint_from) { %>
-                <br><a href="/u/<%= post.reprint_info.reprint_from.name %>/<%= post.reprint_info.reprint_from.day %>/<%= post.reprint_info.reprint_from.title %>">原文链接</a>
+                <br><a href="/p/<%= post.reprint_info.reprint_from._id %>">原文链接</a>
             <% } %>
         </p>
-        <p class="postcontent"><%-post.post%></p>
+        <p><%- post.post %></p>
 
         <p class="info">
             阅读：<%= post.pv %> |
@@ -33,9 +33,5 @@
         </p>
         <% }) %>
 </div>
-
-
-
-
 <%- include paging %>
 <%- include footer %>

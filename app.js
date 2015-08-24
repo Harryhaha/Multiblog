@@ -10,7 +10,7 @@ var routes = require('./routes/index');
 var users = require('./routes/users');
 
 var session = require('express-session');
-var MongoStore = require('connect-mongostore')(session);
+var MongoStore = require('connect-mongo')(session);
 var settings = require('./settings');
 
 var flash = require('connect-flash');

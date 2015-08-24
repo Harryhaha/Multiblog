@@ -1,3 +1,4 @@
+var ObjectID = require('mongodb').ObjectID;
 var mongodb = require('./db'),
     markdown = require('markdown').markdown;
 
@@ -91,11 +92,9 @@ Post.getTen = function(name, page, callback) {
                         return callback(err);
                     }
                     //解析 markdown 为 html
-                    /*
-                    docs.forEach(function (doc) {  
-                        doc.post = markdown.toHTML(doc.post);
-                    });
-                    */
+                    //docs.forEach(function (doc) {
+                    //   doc.post = markdown.toHTML(doc.post);
+                    //});
                     callback(null, docs, total);
                 });
             });
@@ -104,7 +103,7 @@ Post.getTen = function(name, page, callback) {
 };
 
 //获取一篇文章
-Post.getOne = function(name, day, title, callback) {
+Post.getOne = function(_id, callback) {
     //打开数据库
     mongodb.open(function (err, db) {
         if (err) {
@@ -118,9 +117,7 @@ Post.getOne = function(name, day, title, callback) {
             }
             //根据用户名、发表日期及文章名进行查询
             collection.findOne({
-                "name": name,
-                "time.day": day,
-                "title": title
+                "_id": new ObjectID(_id)
             }, function (err, doc) {
                 if (err) {
                     mongodb.close();
@@ -129,9 +126,7 @@ Post.getOne = function(name, day, title, callback) {
                 if (doc) {
                     //每访问 1 次，pv 值增加 1
                     collection.update({
-                        "name": name,
-                        "time.day": day,
-                        "title": title
+                        "_id": new ObjectID(_id)
                     }, {
                         $inc: {"pv": 1}
                     }, function (err) {
@@ -141,9 +136,8 @@ Post.getOne = function(name, day, title, callback) {
                         }
                     });
                     //解析 markdown 为 html
-                    /*
-                    doc.post = markdown.toHTML(doc.post);
-                    */
+                    //doc.post = markdown.toHTML(doc.post);
+                    //console.log(doc.post);
                     doc.comments.forEach(function (comment) {
                         comment.content = markdown.toHTML(comment.content);
                     });
@@ -156,7 +150,7 @@ Post.getOne = function(name, day, title, callback) {
 
 
 //返回原始发表的内容（markdown 格式）
-Post.edit = function(name, day, title, callback) {
+Post.edit = function(_id, callback) {
     //打开数据库
     mongodb.open(function (err, db) {
         if (err) {
@@ -170,9 +164,7 @@ Post.edit = function(name, day, title, callback) {
             }
             //根据用户名、发表日期及文章名进行查询
             collection.findOne({
-                "name": name,
-                "time.day": day,
-                "title": title
+                "_id": new ObjectID(_id)
             }, function (err, doc) {
                 mongodb.close();
                 if (err) {
@@ -184,8 +176,9 @@ Post.edit = function(name, day, title, callback) {
     });
 };
 
+
 //更新一篇文章及其相关信息
-Post.update = function(name, day, title, post, callback) {
+Post.update = function(_id, post, callback) {
     //打开数据库
     mongodb.open(function (err, db) {
         if (err) {
@@ -199,9 +192,7 @@ Post.update = function(name, day, title, post, callback) {
             }
             //更新文章内容
             collection.update({
-                "name": name,
-                "time.day": day,
-                "title": title
+                "_id": new ObjectID(_id)
             }, {
                 $set: {post: post}
             }, function (err) {
@@ -217,7 +208,7 @@ Post.update = function(name, day, title, post, callback) {
 
 
 //删除一篇文章
-Post.remove = function(name, day, title, callback) {
+Post.remove = function(_id, callback) {
     //打开数据库
     mongodb.open(function (err, db) {
         if (err) {
@@ -231,9 +222,7 @@ Post.remove = function(name, day, title, callback) {
             }
             //查询要删除的文档
             collection.findOne({
-                "name": name,
-                "time.day": day,
-                "title": title
+                "_id": new ObjectID(_id)
             }, function (err, doc) {
                 if (err) {
                     mongodb.close();
@@ -253,9 +242,9 @@ Post.remove = function(name, day, title, callback) {
                     }, {
                         $pull: {
                             "reprint_info.reprint_to": {
-                                "name": name,
-                                "day": day,
-                                "title": title
+                                "name": doc.name,
+                                "day": doc.time.day,
+                                "title": doc.title
                             }}
                     }, function (err) {
                         if (err) {
@@ -267,9 +256,7 @@ Post.remove = function(name, day, title, callback) {
 
                 //删除转载来的文章所在的文档
                 collection.remove({
-                    "name": name,
-                    "time.day": day,
-                    "title": title
+                    "_id": new ObjectID(_id)
                 }, {
                     w: 1
                 }, function (err) {
@@ -419,9 +406,7 @@ Post.reprint = function(reprint_from, reprint_to, callback) {
             }
             //找到被转载的文章的原文档
             collection.findOne({
-                "name": reprint_from.name,
-                "time.day": reprint_from.day,
-                "title": reprint_from.title
+                "_id": new ObjectID(reprint_from._id)
             }, function (err, doc) {
                 if (err) {
                     mongodb.close();
@@ -450,9 +435,7 @@ Post.reprint = function(reprint_from, reprint_to, callback) {
 
                 //更新被转载的原文档的 reprint_info 内的 reprint_to
                 collection.update({
-                    "name": reprint_from.name,
-                    "time.day": reprint_from.day,
-                    "title": reprint_from.title
+                    "_id": new ObjectID(reprint_from._id)
                 }, {
                     $push: {
                         "reprint_info.reprint_to": {
@@ -471,7 +454,7 @@ Post.reprint = function(reprint_from, reprint_to, callback) {
                 collection.insert(doc, {
                     safe: true
                 }, function (err, post) {
-                    var test_post = post;
+                    //var test_post = post;
                     mongodb.close();
                     if (err) {
                         return callback(err);
